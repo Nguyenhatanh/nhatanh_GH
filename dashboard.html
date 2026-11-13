@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gia Hòa — Đánh Giá Chương Trình Bán Hàng</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f8fafc;--bg-card:#fff;--bg-hover:#f1f5f9;--bg-muted:#f1f5f9;
+  --border:#e2e8f0;--border-light:#f1f5f9;
+  --accent:#16a34a;--accent-light:#dcfce7;--accent-bg:rgba(22,163,74,.06);
+  --gradient:linear-gradient(135deg,#16a34a,#059669);
+  --blue:#2563eb;--blue-light:#dbeafe;--orange:#ea580c;--orange-light:#ffedd5;
+  --purple:#7c3aed;--purple-light:#ede9fe;--red:#dc2626;--red-light:#fee2e2;
+  --amber:#b45309;--amber-light:#fef3c7;
+  --t1:#0f172a;--t2:#334155;--t3:#64748b;--t4:#94a3b8;
+  --r:12px;--r-sm:8px;
+  --shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --shadow-md:0 4px 12px rgba(0,0,0,.08);--tr:.2s ease;
+}
+html{font-size:14px}
+body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--t1);min-height:100vh}
+
+/* TOPBAR */
+.topbar{background:var(--bg-card);border-bottom:1px solid var(--border);padding:0 32px;height:64px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.tb-left{display:flex;align-items:center;gap:14px}
+.logo{width:38px;height:38px;background:var(--gradient);border-radius:10px;display:grid;place-items:center;color:#fff;font-weight:800;font-size:15px}
+.topbar h1{font-size:1.1rem;font-weight:700}
+.tag{font-size:.7rem;font-weight:600;padding:3px 10px;border-radius:20px;background:var(--accent-light);color:var(--accent)}
+.tb-right{display:flex;align-items:center;gap:16px}
+.tb-right .info{text-align:right}
+.tb-right .name{font-weight:600;font-size:.88rem}
+.tb-right .role{font-size:.78rem;color:var(--t3)}
+.avatar{width:36px;height:36px;border-radius:50%;background:var(--gradient);display:grid;place-items:center;color:#fff;font-weight:700;font-size:12px}
+
+.container{max-width:1200px;margin:0 auto;padding:24px 32px}
+
+/* STEPPER */
+.stepper{background:var(--bg-card);border-radius:var(--r);box-shadow:var(--shadow);padding:20px 24px;margin-bottom:20px;display:flex}
+.st{flex:1;position:relative;text-align:center;cursor:default;user-select:none}
+.st::after{content:'';position:absolute;top:17px;left:calc(50% + 22px);right:calc(-50% + 22px);height:2px;background:var(--border);z-index:0}
+.st:last-child::after{display:none}
+.st.done::after{background:var(--accent)}
+.st-dot{width:34px;height:34px;border-radius:50%;display:inline-grid;place-items:center;font-weight:700;font-size:.85rem;position:relative;z-index:1;background:var(--bg-muted);color:var(--t4);border:2px solid var(--border);transition:all .3s}
+.st.active .st-dot{background:var(--blue-light);color:var(--blue);border-color:var(--blue);box-shadow:0 0 0 5px rgba(37,99,235,.12)}
+.st.done .st-dot{background:var(--accent);color:#fff;border-color:var(--accent)}
+.st.done{cursor:pointer}
+.st.done:hover .st-label{color:var(--accent);text-decoration:underline}
+.st-label{font-size:.8rem;font-weight:600;color:var(--t2);margin-top:8px}
+.st.pending .st-label{color:var(--t4)}
+.st-sub{font-size:.7rem;color:var(--t4);margin-top:2px}
+
+/* PANELS */
+.panel{display:none;animation:fadeIn .3s ease}
+.panel.visible{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:16px;flex-wrap:wrap}
+.panel-head h2{font-size:1.25rem;font-weight:700}
+.panel-head p{color:var(--t3);font-size:.88rem;margin-top:4px;max-width:720px}
+.chip{display:inline-block;font-size:.7rem;font-weight:700;padding:3px 10px;border-radius:20px;background:var(--blue-light);color:var(--blue);margin-bottom:6px;letter-spacing:.3px}
+
+.card{background:var(--bg-card);border-radius:var(--r);box-shadow:var(--shadow);border:1px solid var(--border-light);padding:22px;margin-bottom:16px}
+.card h3{font-size:.95rem;font-weight:700;margin-bottom:14px}
+
+.actions{display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-top:8px;padding:16px 0}
+.actions .right{display:flex;gap:10px;margin-left:auto;flex-wrap:wrap}
+
+.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 22px;border-radius:var(--r-sm);font-size:.88rem;font-weight:600;border:none;cursor:pointer;transition:var(--tr);font-family:inherit}
+.btn-primary{background:var(--gradient);color:#fff}
+.btn-primary:hover:not(:disabled){filter:brightness(1.08);transform:translateY(-1px);box-shadow:0 4px 14px rgba(22,163,74,.25)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn-outline{background:#fff;border:1.5px solid var(--border);color:var(--t2)}
+.btn-outline:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+.btn-blue{background:var(--blue);color:#fff}
+.btn-blue:hover:not(:disabled){filter:brightness(1.1)}
+.btn-sm{padding:7px 14px;font-size:.82rem}
+
+/* UPLOAD */
+.upload{background:var(--bg-card);border:2px dashed var(--border);border-radius:var(--r);padding:44px 32px;text-align:center;transition:var(--tr)}
+.upload.drag{border-color:var(--accent);background:var(--accent-bg)}
+.upload-icon{width:56px;height:56px;border-radius:50%;background:var(--accent-light);color:var(--accent);display:inline-grid;place-items:center;margin-bottom:14px}
+.upload h2{font-size:1.15rem;font-weight:700;margin-bottom:6px}
+.upload p{font-size:.88rem;color:var(--t3);margin-bottom:18px}
+.upload .or{font-size:.82rem;color:var(--t4);margin:12px 0}
+input[type=file]{display:none}
+
+/* ALERTS */
+.alert{border-radius:var(--r);padding:16px 18px;margin-bottom:16px;font-size:.88rem;line-height:1.55}
+.alert b{display:block;margin-bottom:4px;font-size:.95rem}
+.alert ul{margin:6px 0 0 18px}
+.alert.err{background:var(--red-light);color:#991b1b;border:1px solid #fecaca}
+.alert.ok{background:var(--accent-light);color:#14532d;border:1px solid #bbf7d0}
+.alert.warn{background:var(--amber-light);color:var(--amber);border:1px solid #fde68a}
+.alert.info{background:var(--blue-light);color:#1e3a8a;border:1px solid #bfdbfe}
+
+details.tpl{margin-top:16px;text-align:left}
+details.tpl summary{cursor:pointer;font-size:.85rem;color:var(--blue);font-weight:600}
+.tpl-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:10px}
+.tpl-grid div{background:var(--bg-muted);border-radius:var(--r-sm);padding:10px 12px;font-size:.78rem;color:var(--t2)}
+.tpl-grid div strong{display:block;color:var(--t1);margin-bottom:4px;font-size:.82rem}
+code{font-family:ui-monospace,Consolas,monospace;font-size:.78rem;background:var(--bg-muted);padding:1px 5px;border-radius:4px}
+
+/* SHEET LIST */
+.sheet-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.sheet{border:1px solid var(--border);border-radius:var(--r-sm);padding:12px 14px}
+.sheet .nm{font-weight:700;font-size:.85rem}
+.sheet .lb{font-size:.75rem;color:var(--t3)}
+.sheet .ct{font-size:.8rem;margin-top:6px;font-weight:600}
+.sheet.ok{border-color:#bbf7d0;background:var(--accent-bg)}
+.sheet.ok .ct{color:var(--accent)}
+.sheet.bad{border-color:#fecaca;background:#fef2f2}
+.sheet.bad .ct{color:var(--red)}
+
+/* CLEAN */
+.clean-grid{display:grid;grid-template-columns:340px 1fr;gap:16px;align-items:start}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--border-light);font-size:.83rem;cursor:pointer;line-height:1.4}
+.opt:last-child{border-bottom:none}
+.opt input{margin-top:2px;accent-color:var(--accent);width:16px;height:16px;flex-shrink:0}
+.opt .cnt{margin-left:auto;font-weight:700;font-size:.75rem;padding:1px 8px;border-radius:10px;background:var(--bg-muted);color:var(--t3);flex-shrink:0}
+.opt .cnt.hit{background:var(--orange-light);color:var(--orange)}
+.dirty-note{font-size:.78rem;color:var(--orange);margin-top:10px;display:none}
+
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.kpi{background:var(--bg-card);border-radius:var(--r);padding:16px 18px;box-shadow:var(--shadow);border:1px solid var(--border-light)}
+.kpi-label{font-size:.75rem;color:var(--t3);margin-bottom:5px}
+.kpi-val{font-size:1.3rem;font-weight:800}
+.kpi-sub{font-size:.75rem;color:var(--t3);margin-top:4px}
+.badge{font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:4px;display:inline-block}
+.badge.g{background:var(--accent-light);color:var(--accent)}
+.badge.r{background:var(--red-light);color:var(--red)}
+.badge.o{background:var(--orange-light);color:var(--orange)}
+.badge.b{background:var(--blue-light);color:var(--blue)}
+.badge.m{background:var(--bg-muted);color:var(--t3)}
+
+/* TABLE */
+.tbl-wrap{overflow-x:auto;border:1px solid var(--border-light);border-radius:var(--r-sm)}
+table{width:100%;border-collapse:collapse}
+thead{background:var(--bg-muted)}
+th{text-align:left;padding:9px 12px;font-size:.7rem;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.4px;white-space:nowrap}
+td{padding:9px 12px;font-size:.82rem;border-bottom:1px solid var(--border-light);white-space:nowrap}
+tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:var(--bg-hover)}
+.amt{font-variant-numeric:tabular-nums;text-align:right}
+tr.expand td{background:#fafafa;white-space:normal}
+.rule-row{cursor:pointer}
+.rule-row.has td:first-child::before{content:'▸ ';color:var(--t4)}
+.rule-row.open td:first-child::before{content:'▾ '}
+.muted{color:var(--t4)}
+
+/* PROCESS */
+.proc-list{display:flex;flex-direction:column;gap:10px}
+.proc{display:flex;gap:14px;align-items:flex-start;padding:14px 16px;border:1px solid var(--border);border-radius:var(--r-sm);transition:all .3s}
+.proc .dot{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:.8rem;background:var(--bg-muted);color:var(--t4);border:2px solid var(--border);flex-shrink:0}
+.proc.run{border-color:var(--blue);background:#f8fbff}
+.proc.run .dot{background:var(--blue-light);color:var(--blue);border-color:var(--blue);animation:pulse 1.2s infinite}
+.proc.done{border-color:#bbf7d0}
+.proc.done .dot{background:var(--accent);color:#fff;border-color:var(--accent)}
+.proc.err{border-color:#fecaca;background:#fef2f2}
+.proc.err .dot{background:var(--red);color:#fff;border-color:var(--red)}
+.proc .t{font-weight:700;font-size:.9rem}
+.proc .d{font-size:.8rem;color:var(--t3);margin-top:2px}
+.proc .r{font-size:.8rem;color:var(--accent);font-weight:600;margin-top:4px}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(37,99,235,.25)}50%{box-shadow:0 0 0 7px rgba(37,99,235,0)}}
+
+/* CONFIRM */
+.confirm-box{display:flex;gap:10px;align-items:center;padding:14px 16px;border-radius:var(--r-sm);background:var(--amber-light);border:1px solid #fde68a;font-size:.88rem;cursor:pointer}
+.confirm-box input{width:18px;height:18px;accent-color:var(--accent)}
+
+/* REPORT */
+.report-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.detail-grid .card{margin-bottom:0}
+.chart-box{height:260px;position:relative}
+.program-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:16px}
+.p-card{background:var(--bg-card);border-radius:var(--r);box-shadow:var(--shadow);border:1px solid var(--border-light);padding:20px}
+.p-card-head{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.p-card-icon{width:40px;height:40px;border-radius:var(--r-sm);display:grid;place-items:center;font-weight:700;font-size:15px;flex-shrink:0}
+.p-card-name{font-weight:700;font-size:.95rem}
+.p-card-orders{font-size:.78rem;color:var(--t3);margin-top:2px}
+.rec-badge{padding:4px 12px;border-radius:20px;font-size:.72rem;font-weight:700;display:inline-block;margin-left:auto}
+.rec-badge.continue{background:var(--accent-light);color:var(--accent)}
+.rec-badge.adjust{background:var(--orange-light);color:var(--orange)}
+.rec-badge.stop{background:var(--red-light);color:var(--red)}
+.p-card-rows{display:grid;grid-template-columns:1fr 1fr;gap:6px 20px}
+.p-row{display:flex;justify-content:space-between;padding:3px 0;font-size:.83rem}
+.p-row .label{color:var(--t3)}
+.p-row .value{font-weight:600}
+.margin-track{grid-column:1/-1;margin-top:6px;height:6px;background:var(--bg-muted);border-radius:3px;overflow:hidden}
+.margin-fill{height:100%;border-radius:3px}
+.margin-info{grid-column:1/-1;display:flex;justify-content:space-between;font-size:.78rem;margin-top:4px}
+
+.loading{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+.btn-outline .loading{border-color:rgba(0,0,0,.15);border-top-color:var(--t2)}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.footer{text-align:center;padding:28px;color:var(--t4);font-size:.78rem}
+
+@media(max-width:900px){
+  .container{padding:16px}
+  .kpi-grid,.sheet-grid,.tpl-grid{grid-template-columns:repeat(2,1fr)}
+  .clean-grid,.detail-grid,.program-cards{grid-template-columns:1fr}
+  .st-sub{display:none}
+  .topbar{padding:0 16px}
+  .tb-right .info{display:none}
+}
+@media(max-width:560px){
+  .kpi-grid,.sheet-grid,.tpl-grid{grid-template-columns:1fr}
+  .st-label{font-size:.68rem}
+  .topbar h1{font-size:.95rem}
+  .tag{display:none}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="tb-left">
+    <div class="logo">GH</div>
+    <h1>Đánh Giá Chương Trình Bán Hàng</h1>
+    <span class="tag">AI Agent</span>
+  </div>
+  <div class="tb-right">
+    <div class="info"><div class="name">Trưởng phòng KD</div><div class="role">Công ty Gia Hòa</div></div>
+    <div class="avatar">TP</div>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- STEPPER -->
+  <nav class="stepper" id="stepper"></nav>
+
+  <!-- ═══ CHẶNG 1 ═══ -->
+  <section class="panel" id="p1">
+    <div class="panel-head"><div>
+      <span class="chip">CHẶNG 1 / 5</span>
+      <h2>Nhập dữ liệu đầu vào</h2>
+      <p>Tải lên file Excel gồm 4 sheet theo mẫu. Hệ thống kiểm tra cấu trúc trước. Nếu file sai mẫu, bạn cần chọn lại file khác.</p>
+    </div></div>
+
+    <div id="p1Result"></div>
+
+    <div class="upload" id="uploadBox">
+      <div class="upload-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
+      <h2 id="uploadTitle">Tải lên file dữ liệu</h2>
+      <p>Kéo thả file Excel (.xlsx) vào đây hoặc bấm chọn file</p>
+      <button class="btn btn-primary" id="btnPick" onclick="document.getElementById('fileInput').click()">Chọn file Excel</button>
+      <div class="or">hoặc</div>
+      <button class="btn btn-outline btn-sm" id="btnDefault" onclick="useDefault()">Dùng dữ liệu mẫu (Du_Lieu_Gia_Hoa.xlsx)</button>
+      <input type="file" id="fileInput" accept=".xlsx,.xls,.xlsm" onchange="pickFile(this)">
+      <details class="tpl">
+        <summary>Xem mẫu file yêu cầu</summary>
+        <div class="tpl-grid">
+          <div><strong>Giao_Dich</strong><code>order_id</code> <code>customer_id</code> <code>product_id</code> <code>quantity</code> <code>gross_revenue</code> <code>promo_code</code></div>
+          <div><strong>Doi_Tra</strong><code>order_id</code> <code>return_amount</code></div>
+          <div><strong>SanPham_GiaVon</strong><code>product_id</code> <code>product_name</code> <code>unit_cost</code></div>
+          <div><strong>ChiPhi_ChuongTrinh</strong><code>promo_code</code> <code>program_name</code> <code>fixed_cost</code></div>
+        </div>
+      </details>
+    </div>
+
+    <div class="actions" id="p1Actions" style="display:none">
+      <button class="btn btn-outline" onclick="resetAll()">← Chọn file khác</button>
+      <div class="right"><button class="btn btn-primary" id="btnToClean" onclick="goClean()">Tiếp tục: Làm sạch dữ liệu →</button></div>
+    </div>
+  </section>
+
+  <!-- ═══ CHẶNG 2 ═══ -->
+  <section class="panel" id="p2">
+    <div class="panel-head"><div>
+      <span class="chip">CHẶNG 2 / 5</span>
+      <h2>Làm sạch dữ liệu</h2>
+      <p>Bật hoặc tắt các quy tắc rồi bấm <b>Làm sạch lại</b> để xem kết quả. Khi thấy dữ liệu đã đúng ý, bấm <b>Dữ liệu đã ổn</b> để sang bước xử lý.</p>
+    </div></div>
+
+    <div class="kpi-grid" id="cleanKpi"></div>
+    <div id="cleanAlert"></div>
+
+    <div class="clean-grid">
+      <div class="card">
+        <h3>Quy tắc làm sạch</h3>
+        <div id="optList"></div>
+        <div class="dirty-note" id="dirtyNote">Bạn đã đổi quy tắc. Hãy bấm "Làm sạch lại" để áp dụng.</div>
+        <button class="btn btn-blue btn-sm" style="margin-top:12px;width:100%;justify-content:center" id="btnReclean" onclick="runClean()">↻ Làm sạch lại</button>
+      </div>
+      <div>
+        <div class="card">
+          <h3>Kết quả từng quy tắc <span class="muted" style="font-weight:400;font-size:.78rem">(bấm vào dòng để xem các dòng dữ liệu bị ảnh hưởng)</span></h3>
+          <div class="tbl-wrap"><table>
+            <thead><tr><th>Quy tắc</th><th>Sheet</th><th style="text-align:right">Số dòng</th><th>Hành động</th></tr></thead>
+            <tbody id="ruleTable"></tbody>
+          </table></div>
+        </div>
+        <div class="card">
+          <h3>Xem trước dữ liệu giao dịch sau khi làm sạch <span class="muted" style="font-weight:400;font-size:.78rem">(15 dòng đầu)</span></h3>
+          <div class="tbl-wrap"><table id="previewTable"></table></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-outline" onclick="back(1)">← Quay lại: chọn file khác</button>
+      <div class="right"><button class="btn btn-primary" id="btnAcceptClean" onclick="acceptClean()">Dữ liệu đã ổn, sang Xử lý →</button></div>
+    </div>
+  </section>
+
+  <!-- ═══ CHẶNG 3 ═══ -->
+  <section class="panel" id="p3">
+    <div class="panel-head"><div>
+      <span class="chip">CHẶNG 3 / 5</span>
+      <h2>Xử lý dữ liệu</h2>
+      <p>Hệ thống chạy 4 bước trên dữ liệu đã làm sạch. Kết quả chỉ được xuất ra sau khi bạn xác nhận ở chặng 4.</p>
+    </div></div>
+    <div id="procAlert"></div>
+    <div class="card">
+      <div class="proc-list" id="procList"></div>
+    </div>
+    <div class="actions">
+      <button class="btn btn-outline" id="btnProcBack" onclick="back(2)">← Quay lại: làm sạch</button>
+      <div class="right">
+        <button class="btn btn-primary" id="btnProcess" onclick="runProcess()">▶ Bắt đầu xử lý</button>
+        <button class="btn btn-primary" id="btnToConfirm" style="display:none" onclick="showStage(4)">Sang bước xác nhận →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ CHẶNG 4 ═══ -->
+  <section class="panel" id="p4">
+    <div class="panel-head"><div>
+      <span class="chip">CHẶNG 4 / 5</span>
+      <h2>Xác nhận kết quả</h2>
+      <p>Kiểm tra số liệu trước khi xuất báo cáo. Nếu thấy chưa đúng, bạn có thể quay lại bước làm sạch hoặc chọn file khác.</p>
+    </div></div>
+    <div id="confirmRecon"></div>
+    <div class="kpi-grid" id="confirmKpi"></div>
+    <div class="card">
+      <h3>Kết quả theo chương trình</h3>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>Mã</th><th>Chương trình</th><th style="text-align:right">Số đơn</th><th style="text-align:right">DT gộp</th><th style="text-align:right">Đổi trả</th><th style="text-align:right">DT thuần</th><th style="text-align:right">Giá vốn</th><th style="text-align:right">Chi phí CĐ</th><th style="text-align:right">Đóng góp</th><th style="text-align:right">Biên %</th></tr></thead>
+        <tbody id="confirmTable"></tbody>
+      </table></div>
+    </div>
+    <label class="confirm-box"><input type="checkbox" id="chkConfirm" onchange="updConfirm()"> Tôi đã kiểm tra số liệu ở trên và đồng ý xuất báo cáo.</label>
+    <div class="actions">
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn btn-outline" onclick="back(2)">← Làm sạch lại</button>
+        <button class="btn btn-outline" onclick="back(1)">← Chọn file khác</button>
+      </div>
+      <div class="right"><button class="btn btn-primary" id="btnConfirm" disabled onclick="confirmExport()">✓ Xác nhận &amp; xuất báo cáo</button></div>
+    </div>
+  </section>
+
+  <!-- ═══ CHẶNG 5 ═══ -->
+  <section class="panel" id="p5">
+    <div class="report-head">
+      <div>
+        <span class="chip" style="background:var(--accent-light);color:var(--accent)">CHẶNG 5 / 5 · ĐÃ XÁC NHẬN</span>
+        <h2 style="font-size:1.25rem;font-weight:700">Báo cáo &amp; Dashboard</h2>
+        <p class="muted" id="reportMeta" style="font-size:.85rem;margin-top:4px"></p>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn btn-outline btn-sm" onclick="resetAll()">＋ Phân tích file mới</button>
+        <button class="btn btn-primary btn-sm" onclick="location.href='/api/download'">⬇ Tải báo cáo Excel</button>
+      </div>
+    </div>
+    <div class="kpi-grid" id="reportKpi"></div>
+    <h3 style="font-size:1.05rem;font-weight:700;margin-bottom:12px">Chi tiết từng chương trình</h3>
+    <div class="program-cards" id="programCards"></div>
+    <div class="detail-grid">
+      <div class="card"><h3>Biên đóng góp: so sánh</h3><div class="chart-box"><canvas id="marginChart"></canvas></div></div>
+      <div class="card"><h3>Cơ cấu doanh thu thuần</h3><div class="chart-box"><canvas id="revenueChart"></canvas></div></div>
+    </div>
+    <div class="card">
+      <h3>Bảng kết quả tổng hợp</h3>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>Mã</th><th>Chương trình</th><th style="text-align:right">Số đơn</th><th style="text-align:right">DT thuần</th><th style="text-align:right">Giá vốn</th><th style="text-align:right">Chi phí CĐ</th><th style="text-align:right">Đóng góp</th><th style="text-align:right">Biên %</th><th>Khuyến nghị</th></tr></thead>
+        <tbody id="reportTable"></tbody>
+      </table></div>
+    </div>
+    <div class="card">
+      <h3>Nội dung file Excel</h3>
+      <div class="tbl-wrap"><table>
+        <thead><tr><th>Sheet</th><th>Nội dung</th></tr></thead>
+        <tbody>
+          <tr><td><code>KetQua_ChuongTrinh</code></td><td>Doanh thu, giá vốn, chi phí, đóng góp, biên % của từng chương trình</td></tr>
+          <tr><td><code>Chua_PhanBo</code></td><td>Các đơn không có mã KM hợp lệ (trống / NONE / mã lạ)</td></tr>
+          <tr><td><code>DoiSoat</code></td><td>Tổng phân bổ + chưa phân bổ so với tổng gốc</td></tr>
+          <tr><td><code>NhatKy</code></td><td>Nhật ký làm sạch và xử lý</td></tr>
+          <tr><td><code>LamSach_BaoCao</code></td><td>Từng quy tắc làm sạch và số dòng bị ảnh hưởng</td></tr>
+          <tr><td><code>DuLieu_BiLoai</code></td><td>Các dòng bị loại kèm lý do (chỉ có khi có dòng bị loại)</td></tr>
+          <tr><td><code>DuLieu_DaLamSach</code></td><td>Dữ liệu giao dịch sau khi làm sạch</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </section>
+
+  <div class="footer">Gia Hòa AI Agent · Xây dựng cho AI301</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+/* ── TIỆN ÍCH ── */
+const fmt = n => new Intl.NumberFormat('vi-VN').format(Math.round(n||0));
+const fmtS = n => { const a=Math.abs(n); if(a>=1e9) return (n/1e9).toFixed(2)+' tỷ'; if(a>=1e6) return (n/1e6).toFixed(0)+' tr'; return fmt(n) };
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const $ = id => document.getElementById(id);
+const COLORS = {PROMO_A:{hex:'#16a34a',bg:'#dcfce7'},PROMO_B:{hex:'#2563eb',bg:'#dbeafe'},PROMO_C:{hex:'#ea580c',bg:'#ffedd5'},PROMO_D:{hex:'#7c3aed',bg:'#ede9fe'}};
+const col = c => COLORS[c] || {hex:'#64748b',bg:'#f1f5f9'};
+const recCls = r => r==='TIẾP TỤC'?'continue':(r==='DỪNG'?'stop':'adjust');
+
+async function api(url, body, isForm){
+  const opt = {method:'POST'};
+  if(isForm) opt.body = body;
+  else { opt.headers = {'Content-Type':'application/json'}; opt.body = JSON.stringify(body||{}); }
+  try {
+    const r = await fetch(url, opt);
+    return await r.json();
+  } catch(e) {
+    return {ok:false, errors:['Không kết nối được server. Kiểm tra cửa sổ terminal đang chạy "python server.py".']};
+  }
+}
+function busy(btn, on, text){
+  if(on){ btn.dataset.t = btn.innerHTML; btn.disabled = true; btn.innerHTML = '<span class="loading"></span> '+(text||'Đang xử lý...'); }
+  else { btn.disabled = false; if(btn.dataset.t) btn.innerHTML = btn.dataset.t; }
+}
+const alertBox = (type, title, items) =>
+  `<div class="alert ${type}"><b>${title}</b>${items && items.length ? '<ul>'+items.map(i=>'<li>'+esc(i)+'</li>').join('')+'</ul>' : ''}</div>`;
+
+/* ── STEPPER ── */
+const STAGES = [
+  ['Nhập dữ liệu','Kiểm tra file'],
+  ['Làm sạch','Trùng, thiếu, sai'],
+  ['Xử lý','Phân bổ & tính toán'],
+  ['Xác nhận','Duyệt kết quả'],
+  ['Báo cáo','Excel & dashboard'],
+];
+let maxStage = 1, curStage = 1;
+
+function renderStepper(){
+  $('stepper').innerHTML = STAGES.map((s,i)=>{
+    const n=i+1;
+    const c = n===curStage ? 'active' : (n<curStage || n<maxStage ? 'done' : 'pending');
+    return `<div class="st ${c}" onclick="stepClick(${n})">
+      <div class="st-dot">${c==='done'?'✓':n}</div>
+      <div class="st-label">${s[0]}</div><div class="st-sub">${s[1]}</div></div>`;
+  }).join('');
+}
+function showStage(n){
+  curStage = n; if(n>maxStage) maxStage = n;
+  for(let i=1;i<=5;i++) $('p'+i).classList.toggle('visible', i===n);
+  renderStepper();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function stepClick(n){
+  if(n===curStage) return;
+  if(n<curStage) return back(n);
+  if(n<maxStage) showStage(n);   // tiến tới chặng đã mở (vd: từ chặng 3 sang 4 sau khi xử lý)
+}
+async function back(to){
+  if(maxStage>=4 && to<=3 && !confirm('Quay lại chặng '+to+'? Kết quả xử lý hiện tại sẽ bị huỷ và phải chạy lại.')) return;
+  if(to===1){ return resetAll(); }
+  await api('/api/back',{to});
+  maxStage = to;
+  if(to===2){ resetProcess(); }
+  if(to===3){ resetProcess(); }
+  showStage(to);
+}
+
+/* ═══ CHẶNG 1 ═══ */
+const upBox = $('uploadBox');
+upBox.addEventListener('dragover', e=>{e.preventDefault(); upBox.classList.add('drag')});
+upBox.addEventListener('dragleave', ()=>upBox.classList.remove('drag'));
+upBox.addEventListener('drop', e=>{e.preventDefault(); upBox.classList.remove('drag'); if(e.dataTransfer.files.length) uploadFile(e.dataTransfer.files[0])});
+function pickFile(inp){ if(inp.files.length) uploadFile(inp.files[0]); inp.value=''; }
+
+async function uploadFile(file){
+  const fd = new FormData(); fd.append('file', file);
+  busy($('btnPick'), true, 'Đang kiểm tra...');
+  const r = await api('/api/s1/upload', fd, true);
+  busy($('btnPick'), false);
+  showCheck(r, file.name);
+}
+async function useDefault(){
+  busy($('btnDefault'), true, 'Đang kiểm tra...');
+  const r = await api('/api/s1/default');
+  busy($('btnDefault'), false);
+  showCheck(r, 'Du_Lieu_Gia_Hoa.xlsx');
+}
+
+function sheetCards(sheets){
+  if(!sheets || !sheets.length) return '';
+  return '<div class="card"><h3>Các sheet trong file</h3><div class="sheet-grid">' + sheets.map(s=>{
+    if(s.status==='missing') return `<div class="sheet bad"><div class="nm">${esc(s.sheet)}</div><div class="lb">${esc(s.label)}</div><div class="ct">✗ Không tìm thấy</div></div>`;
+    const bad = s.status!=='ok';
+    const nulls = s.nulls && Object.keys(s.nulls).length ? '<div class="lb" style="margin-top:4px">Ô trống: '+Object.entries(s.nulls).map(([k,v])=>esc(k)+' ('+v+')').join(', ')+'</div>' : '';
+    return `<div class="sheet ${bad?'bad':'ok'}"><div class="nm">${esc(s.sheet)}</div><div class="lb">${esc(s.label)}</div>
+      <div class="ct">${bad ? '✗ '+(s.missing_cols&&s.missing_cols.length?'Thiếu cột: '+esc(s.missing_cols.join(', ')):'Lỗi dữ liệu') : '✓ '+fmt(s.rows)+' dòng'}</div>${nulls}</div>`;
+  }).join('') + '</div></div>';
+}
+
+function showCheck(r, name){
+  let html = '';
+  if(r.ok){
+    html += alertBox('ok', '✓ File "'+esc(name)+'" đúng mẫu. Bạn có thể chuyển sang bước làm sạch.', []);
+    if(r.warnings && r.warnings.length) html += alertBox('warn', 'Lưu ý', r.warnings);
+    html += sheetCards(r.sheets);
+    upBox.style.display='none';
+    $('p1Actions').style.display='flex';
+    maxStage = 2;
+  } else {
+    html += alertBox('err', '✗ File "'+esc(name||'')+'" không đúng mẫu. Vui lòng sửa lại file rồi chọn lại.', r.errors);
+    html += sheetCards(r.sheets);
+    upBox.style.display='';
+    $('uploadTitle').textContent = 'Chọn lại file dữ liệu';
+    $('p1Actions').style.display='none';
+    maxStage = 1;
+  }
+  $('p1Result').innerHTML = html;
+  renderStepper();
+}
+
+async function resetAll(){
+  await api('/api/reset');
+  maxStage = 1;
+  $('p1Result').innerHTML=''; upBox.style.display=''; $('uploadTitle').textContent='Tải lên file dữ liệu';
+  $('p1Actions').style.display='none';
+  cleanOpts = null; resetProcess();
+  showStage(1);
+}
+
+/* ═══ CHẶNG 2 ═══ */
+let cleanOpts = null, optLabels = {}, appliedOpts = null, lastClean = null;
+
+async function goClean(){
+  busy($('btnToClean'), true, 'Đang làm sạch...');
+  if(!cleanOpts){
+    const o = await fetch('/api/s2/options').then(r=>r.json());
+    cleanOpts = {...o.defaults}; optLabels = o.labels;
+  }
+  const ok = await runClean();
+  busy($('btnToClean'), false);
+  if(ok) showStage(2);
+}
+
+async function runClean(){
+  const btn = $('btnReclean'); busy(btn, true, 'Đang làm sạch...');
+  const r = await api('/api/s2/clean', {options: cleanOpts});
+  busy(btn, false);
+  if(!r.ok && !r.steps){ $('cleanAlert').innerHTML = alertBox('err','Không làm sạch được', r.errors); return false; }
+  appliedOpts = {...cleanOpts}; lastClean = r;
+  maxStage = 2; resetProcess();
+  renderClean(r); renderStepper();
+  return true;
+}
+
+function renderClean(r){
+  const stepByKey = {}; r.steps.forEach(s=>stepByKey[s.key]=s);
+  // Tuỳ chọn
+  $('optList').innerHTML = Object.keys(cleanOpts).map(k=>{
+    const s = stepByKey[k]; const n = s ? s.count : 0;
+    return `<label class="opt"><input type="checkbox" ${cleanOpts[k]?'checked':''} onchange="toggleOpt('${k}',this.checked)">
+      <span>${esc(optLabels[k]||k)}</span><span class="cnt ${n?'hit':''}" title="Số dòng/ô phát hiện">${fmt(n)}</span></label>`;
+  }).join('');
+  updDirty();
+
+  // KPI
+  const b=r.rows_before.Giao_Dich, a=r.rows_after.Giao_Dich, ps=r.promo_stats;
+  $('cleanKpi').innerHTML = `
+    <div class="kpi"><div class="kpi-label">Giao dịch ban đầu</div><div class="kpi-val">${fmt(b)}</div><div class="kpi-sub">Đổi trả: ${fmt(r.rows_before.Doi_Tra)} dòng</div></div>
+    <div class="kpi"><div class="kpi-label">Sau làm sạch</div><div class="kpi-val" style="color:var(--accent)">${fmt(a)}</div><div class="kpi-sub">Đổi trả: ${fmt(r.rows_after.Doi_Tra)} dòng</div></div>
+    <div class="kpi"><div class="kpi-label">Dòng bị loại</div><div class="kpi-val" style="color:${r.removed_count?'var(--red)':'var(--t1)'}">${fmt(r.removed_count)}</div><div class="kpi-sub">Có danh sách trong file Excel</div></div>
+    <div class="kpi"><div class="kpi-label">Đơn không có mã KM hợp lệ</div><div class="kpi-val" style="color:var(--orange)">${fmt(ps.trong+ps.none+ps.ma_la)}</div>
+      <div class="kpi-sub"><span class="badge m">trống ${ps.trong}</span> <span class="badge m">NONE ${ps.none}</span> <span class="badge m">mã lạ ${ps.ma_la}</span></div></div>`;
+
+  let al = '';
+  if(!r.ok) al += alertBox('err','Chưa thể sang bước xử lý', r.errors);
+  al += alertBox('info','Đơn không có mã khuyến mãi hợp lệ được giữ lại, không bị xoá.', ['Các đơn này đưa vào mục "Chưa phân bổ" để đối soát tổng doanh thu cho khớp. Đơn nhiều mã: '+fmt(ps.nhieu_ma)+' đơn (doanh thu sẽ được chia đều cho các mã).']);
+  $('cleanAlert').innerHTML = al;
+
+  // Bảng quy tắc
+  $('ruleTable').innerHTML = r.steps.map((s,i)=>{
+    const has = s.sample && s.sample.length && s.count;
+    const actBadge = !s.enabled ? '<span class="badge m">tắt (chỉ phát hiện)</span>' :
+      ({'xoá':'<span class="badge r">xoá</span>','sửa':'<span class="badge b">sửa</span>','điền':'<span class="badge b">điền</span>','gộp':'<span class="badge o">gộp</span>'}[s.action]||esc(s.action));
+    return `<tr class="rule-row ${has?'has':''}" onclick="toggleSample(${i},this)"><td style="white-space:normal">${esc(s.label)}</td><td>${esc(s.sheet)}</td>
+      <td class="amt" style="font-weight:700;color:${s.count?'var(--orange)':'var(--t4)'}">${fmt(s.count)}</td><td>${s.count?actBadge:'<span class="muted">—</span>'}</td></tr>
+      <tr class="expand" id="sample${i}" style="display:none"><td colspan="4">${has?sampleTable(s.sample, s.count):''}</td></tr>`;
+  }).join('');
+
+  // Preview
+  const rows = r.preview||[];
+  if(rows.length){
+    const cols = Object.keys(rows[0]);
+    $('previewTable').innerHTML = '<thead><tr>'+cols.map(c=>'<th>'+esc(c)+'</th>').join('')+'</tr></thead><tbody>'+
+      rows.map(x=>'<tr>'+cols.map(c=>'<td>'+(x[c]==='nan'||x[c]==='None'?'<span class="muted">(trống)</span>':esc(x[c]))+'</td>').join('')+'</tr>').join('')+'</tbody>';
+  } else $('previewTable').innerHTML = '<tbody><tr><td class="muted">Không có dữ liệu</td></tr></tbody>';
+}
+function sampleTable(rows, total){
+  const cols = Object.keys(rows[0]);
+  return '<div class="muted" style="font-size:.75rem;margin-bottom:6px">Hiển thị '+rows.length+' / '+fmt(total)+' dòng</div><div class="tbl-wrap"><table><thead><tr>'+cols.map(c=>'<th>'+esc(c)+'</th>').join('')+'</tr></thead><tbody>'+
+    rows.map(x=>'<tr>'+cols.map(c=>'<td>'+(x[c]==='nan'||x[c]==='None'?'<span class="muted">(trống)</span>':esc(x[c]))+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>';
+}
+function toggleSample(i, tr){
+  const el = $('sample'+i); if(!el || !el.innerHTML.trim().length || el.textContent.trim()==='') return;
+  const open = el.style.display==='none'; el.style.display = open?'':'none'; tr.classList.toggle('open', open);
+}
+function toggleOpt(k,v){ cleanOpts[k]=v; updDirty(); }
+function isDirty(){ return appliedOpts && Object.keys(cleanOpts).some(k=>cleanOpts[k]!==appliedOpts[k]); }
+function updDirty(){
+  const d = isDirty();
+  $('dirtyNote').style.display = d?'block':'none';
+  $('btnAcceptClean').disabled = d || (lastClean && !lastClean.ok);
+  $('btnAcceptClean').title = d ? 'Hãy bấm "Làm sạch lại" trước' : '';
+}
+async function acceptClean(){
+  const btn=$('btnAcceptClean'); busy(btn,true,'Đang chuyển...');
+  const r = await api('/api/s2/accept'); busy(btn,false); updDirty();
+  if(!r.ok){ $('cleanAlert').innerHTML = alertBox('err','Chưa thể sang bước xử lý', r.errors) + $('cleanAlert').innerHTML; return; }
+  resetProcess(); showStage(3);
+}
+
+/* ═══ CHẶNG 3 ═══ */
+const PROC = [
+  ['Phân loại mã khuyến mãi','Tách đơn có mã hợp lệ / đơn chưa phân bổ (trống, NONE, mã lạ)'],
+  ['Phân bổ doanh thu','Đơn 1 mã → gán trọn; đơn nhiều mã → chia đều 1/N; trừ đổi trả'],
+  ['Tính kết quả chương trình','DT thuần − Giá vốn thuần − Chi phí cố định = Phần đóng góp'],
+  ['Đối soát','Tổng phân bổ + chưa phân bổ phải khớp tổng doanh thu đầu vào'],
+];
+let procResult = null;
+function resetProcess(){
+  procResult = null;
+  $('procList').innerHTML = PROC.map((p,i)=>`<div class="proc" id="proc${i}"><div class="dot">${i+1}</div><div><div class="t">${p[0]}</div><div class="d">${p[1]}</div><div class="r" id="procR${i}"></div></div></div>`).join('');
+  $('procAlert').innerHTML='';
+  $('btnProcess').style.display=''; $('btnProcess').disabled=false; $('btnProcess').innerHTML='▶ Bắt đầu xử lý';
+  $('btnToConfirm').style.display='none';
+  $('chkConfirm').checked=false; updConfirm();
+}
+const sleep = ms => new Promise(r=>setTimeout(r,ms));
+function procText(i, d){
+  if(i===0) return '✓ '+fmt(d.don_hop_le)+' đơn hợp lệ · '+fmt(d.don_khong_hop_le)+' đơn chưa phân bổ';
+  if(i===1) return '✓ Phân bổ vào '+d.length+' chương trình: '+d.map(x=>esc(x.promo_code)+' ('+fmtS(x.doanh_thu_gop)+')').join(', ');
+  if(i===2) return '✓ Đã tính '+d.so_chuong_trinh+' chương trình';
+  if(i===3) return d.ket_qua==='KHỚP' ? '✓ Đối soát KHỚP · tổng '+fmt(d.tong_doi_soat)+' ₫' : '✗ KHÔNG KHỚP · sai lệch '+fmt(d.sai_lech)+' ₫';
+}
+async function runProcess(){
+  const btn = $('btnProcess'); busy(btn,true,'Đang xử lý...'); $('btnProcBack').disabled=true;
+  $('proc0').className='proc run';
+  const r = await api('/api/s3/process');
+  const steps = r.steps || [];
+  for(let i=0;i<PROC.length;i++){
+    const el = $('proc'+i);
+    el.className = 'proc run'; await sleep(450);
+    if(i < steps.length){
+      const bad = i===3 && steps[i].detail.ket_qua!=='KHỚP';
+      el.className = 'proc '+(bad?'err':'done'); el.querySelector('.dot').textContent = bad?'✗':'✓';
+      $('procR'+i).innerHTML = procText(i, steps[i].detail);
+      if(bad) $('procR'+i).style.color='var(--red)';
+    } else {
+      el.className='proc err'; el.querySelector('.dot').textContent='✗';
+      break;
+    }
+  }
+  $('btnProcBack').disabled=false;
+  if(!r.ok){
+    busy(btn,false); btn.innerHTML='↻ Chạy lại';
+    $('procAlert').innerHTML = alertBox('err','Xử lý thất bại. Hãy quay lại bước làm sạch để kiểm tra dữ liệu.', r.errors);
+    return;
+  }
+  procResult = r;
+  btn.style.display='none'; $('btnToConfirm').style.display='';
+  $('procAlert').innerHTML = alertBox('ok','✓ Đã xử lý xong. Bấm "Sang bước xác nhận" để duyệt kết quả.', []);
+  maxStage = 4; renderConfirm(r); renderStepper();
+}
+
+/* ═══ CHẶNG 4 ═══ */
+function kpiHtml(P, s, ds){
+  const tO=P.reduce((a,p)=>a+p.so_don,0), tR=P.reduce((a,p)=>a+p.doanh_thu_thuan,0), tC=P.reduce((a,p)=>a+p.phan_dong_gop,0);
+  return `
+    <div class="kpi"><div class="kpi-label">Đơn đã phân bổ</div><div class="kpi-val">${fmt(s.don_hop_le)}</div><div class="kpi-sub">${P.length} chương trình · <span class="badge r">${fmt(s.don_khong_hop_le)} chưa phân bổ</span></div></div>
+    <div class="kpi"><div class="kpi-label">Doanh thu thuần</div><div class="kpi-val">${fmtS(tR)} ₫</div><div class="kpi-sub">Sau khi trừ đổi trả</div></div>
+    <div class="kpi"><div class="kpi-label">Tổng đóng góp</div><div class="kpi-val" style="color:var(--accent)">${fmtS(tC)} ₫</div><div class="kpi-sub"><span class="badge g">${tR?(tC/tR*100).toFixed(2):0}% biên TB</span></div></div>
+    <div class="kpi"><div class="kpi-label">Đối soát</div><div class="kpi-val" style="color:${ds.ket_qua==='KHỚP'?'var(--accent)':'var(--red)'}">${esc(ds.ket_qua)}</div><div class="kpi-sub">Tổng: ${fmtS(ds.tong_doi_soat)} ₫</div></div>`;
+}
+function renderConfirm(r){
+  const P=r.programs, ds=r.doi_soat;
+  $('confirmRecon').innerHTML = ds.ket_qua==='KHỚP'
+    ? alertBox('ok','✓ Đối soát khớp: phân bổ '+fmt(ds.tong_phan_bo)+' ₫ + chưa phân bổ '+fmt(ds.tong_chua_phan_bo)+' ₫ = '+fmt(ds.tong_goc)+' ₫ (tổng đầu vào)', [])
+    : alertBox('err','✗ Đối soát không khớp, sai lệch '+fmt(ds.sai_lech)+' ₫. Không thể xuất báo cáo. Hãy quay lại kiểm tra dữ liệu.', []);
+  $('confirmKpi').innerHTML = kpiHtml(P, r.summary, ds);
+  $('confirmTable').innerHTML = P.map(p=>`<tr><td style="font-weight:600">${esc(p.promo_code)}</td><td>${esc(p.program_name)}</td>
+    <td class="amt">${fmt(p.so_don)}</td><td class="amt">${fmt(p.doanh_thu_gop)}</td><td class="amt">${fmt(p.tong_doi_tra)}</td>
+    <td class="amt">${fmt(p.doanh_thu_thuan)}</td><td class="amt">${fmt(p.gia_von_thuan)}</td><td class="amt">${fmt(p.chi_phi_co_dinh)}</td>
+    <td class="amt" style="color:var(--accent);font-weight:600">${fmt(p.phan_dong_gop)}</td><td class="amt" style="font-weight:600">${p.bien_dong_gop_pct.toFixed(2)}%</td></tr>`).join('');
+  $('chkConfirm').checked=false; $('chkConfirm').disabled = ds.ket_qua!=='KHỚP'; updConfirm();
+}
+function updConfirm(){ $('btnConfirm').disabled = !$('chkConfirm').checked; }
+async function confirmExport(){
+  const btn=$('btnConfirm'); busy(btn,true,'Đang xuất báo cáo...');
+  const r = await api('/api/s4/confirm'); busy(btn,false); updConfirm();
+  if(!r.ok){ $('confirmRecon').innerHTML = alertBox('err','Không xuất được báo cáo', r.errors) + $('confirmRecon').innerHTML; return; }
+  maxStage = 5; showStage(5); renderReport(r);
+}
+
+/* ═══ CHẶNG 5 ═══ */
+let charts = [];
+function renderReport(d){
+  const P=d.programs;
+  $('reportMeta').textContent = 'File: '+d.file+' · Xuất lúc '+d.generated_at+' · Đã làm sạch '+fmt(d.clean.rows_before.Giao_Dich)+' → '+fmt(d.clean.rows_after.Giao_Dich)+' giao dịch';
+  $('reportKpi').innerHTML = kpiHtml(P, d.summary, d.doi_soat);
+  $('programCards').innerHTML = P.map(p=>{ const c=col(p.promo_code); return `
+    <div class="p-card"><div class="p-card-head">
+      <div class="p-card-icon" style="background:${c.bg};color:${c.hex}">${esc(String(p.promo_code).replace('PROMO_',''))}</div>
+      <div><div class="p-card-name">${esc(p.program_name)}</div><div class="p-card-orders">${fmt(p.so_don)} đơn · ${esc(p.ly_do)}</div></div>
+      <span class="rec-badge ${recCls(p.khuyen_nghi)}">${esc(p.khuyen_nghi)}</span></div>
+      <div class="p-card-rows">
+        <div class="p-row"><span class="label">Doanh thu thuần</span><span class="value">${fmtS(p.doanh_thu_thuan)}</span></div>
+        <div class="p-row"><span class="label">Giá vốn thuần</span><span class="value">${fmtS(p.gia_von_thuan)}</span></div>
+        <div class="p-row"><span class="label">Chi phí CĐ</span><span class="value">${fmtS(p.chi_phi_co_dinh)}</span></div>
+        <div class="p-row"><span class="label">Phần đóng góp</span><span class="value" style="color:var(--accent)">${fmtS(p.phan_dong_gop)}</span></div>
+        <div class="margin-track"><div class="margin-fill" style="width:${Math.max(0,Math.min(100,p.bien_dong_gop_pct/50*100)).toFixed(1)}%;background:${c.hex}"></div></div>
+        <div class="margin-info"><span class="muted">Biên đóng góp</span><span style="font-weight:700;color:${c.hex}">${p.bien_dong_gop_pct.toFixed(2)}%</span></div>
+      </div></div>`; }).join('');
+  $('reportTable').innerHTML = P.map(p=>`<tr><td style="font-weight:600">${esc(p.promo_code)}</td><td>${esc(p.program_name)}</td><td class="amt">${fmt(p.so_don)}</td>
+    <td class="amt">${fmt(p.doanh_thu_thuan)}</td><td class="amt">${fmt(p.gia_von_thuan)}</td><td class="amt">${fmt(p.chi_phi_co_dinh)}</td>
+    <td class="amt" style="color:var(--accent);font-weight:600">${fmt(p.phan_dong_gop)}</td><td class="amt" style="font-weight:600">${p.bien_dong_gop_pct.toFixed(2)}%</td>
+    <td><span class="rec-badge ${recCls(p.khuyen_nghi)}" style="margin:0">${esc(p.khuyen_nghi)}</span></td></tr>`).join('');
+  renderCharts(P);
+}
+function renderCharts(P){
+  charts.forEach(c=>c.destroy()); charts=[];
+  if(typeof Chart==='undefined') return;
+  const m = P.map(p=>p.bien_dong_gop_pct), lo=Math.floor(Math.min(...m)-1), hi=Math.ceil(Math.max(...m)+1);
+  charts.push(new Chart($('marginChart'), {type:'bar',
+    data:{labels:P.map(p=>p.program_name),datasets:[{data:m,backgroundColor:P.map(p=>col(p.promo_code).hex+'30'),borderColor:P.map(p=>col(p.promo_code).hex),borderWidth:2,borderRadius:6,barPercentage:.55}]},
+    options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',
+      scales:{x:{min:lo,max:hi,grid:{color:'#f1f5f9'},ticks:{color:'#64748b',callback:v=>v+'%'}},y:{grid:{display:false},ticks:{color:'#334155'}}},
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' Biên: '+c.raw.toFixed(2)+'%'}}}}}));
+  charts.push(new Chart($('revenueChart'), {type:'doughnut',
+    data:{labels:P.map(p=>p.program_name),datasets:[{data:P.map(p=>p.doanh_thu_thuan),backgroundColor:P.map(p=>col(p.promo_code).hex),borderWidth:3,borderColor:'#fff'}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'55%',
+      plugins:{legend:{position:'bottom',labels:{usePointStyle:true,padding:14,color:'#334155'}},tooltip:{callbacks:{label:c=>' '+c.label+': '+fmtS(c.raw)+' ₫'}}}}}));
+}
+
+/* KHỞI ĐỘNG */
+resetAll();
+</script>
+</body>
+</html>
